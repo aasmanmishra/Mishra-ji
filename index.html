@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MechLearn – Mechanical Engineering made simple</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1c2230;--mut:#5a6477;--acc:#d9480f;--line:#e2e6ee}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b2030;--ink:#e8ecf5;--mut:#9aa6bd;--acc:#ff8a4c;--line:#2b3247}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:22px 16px;text-align:center;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:1.6rem}h1 span{color:var(--acc)}header p{margin:6px 0 12px;color:var(--mut)}
+#q{width:min(420px,90%);padding:10px 14px;border-radius:24px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1rem}
+nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:14px 10px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+nav button{padding:7px 13px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--ink);cursor:pointer;font-size:.9rem}
+nav button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:900px;margin:0 auto;padding:16px}
+.sub{margin:6px 0 18px;color:var(--mut)}
+.books{font-size:.9rem;color:var(--mut);margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.card h3{margin:0 0 8px;color:var(--acc)}
+.row{display:grid;grid-template-columns:1fr 300px;gap:14px}
+@media(max-width:700px){.row{grid-template-columns:1fr}}
+canvas{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.f{font-family:ui-monospace,Consolas,monospace;background:var(--bg);padding:6px 10px;border-radius:8px;display:inline-block;margin:4px 0}
+.tag{font-weight:700}a{color:var(--acc)}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:20px 12px 40px}
+</style></head><body>
+<header><h1>Mech<span>Learn</span></h1>
+<p>Mechanical Engineering for first-year students: simple words, live animations, real-life uses.</p>
+<input id="q" placeholder="Search a topic, e.g. gear, stress, Bernoulli"></header>
+<nav id="nav"></nav><main id="main"></main>
+<footer>Free full courses: <a href="https://nptel.ac.in" target="_blank" rel="noopener">NPTEL</a> · <a href="https://ocw.mit.edu" target="_blank" rel="noopener">MIT OpenCourseWare</a><br>
+Content follows standard textbooks listed in each subject. Always confirm formulas with your own textbook and teacher before exams.</footer>
+<script>
+// ===== CONTENT: add subjects/topics here. a = animation name, f = formula, u = real-life use =====
+const D=[
+{n:"Engineering Mechanics",d:"How forces make things stay still or move.",b:"Hibbeler – Engineering Mechanics; Beer & Johnston – Vector Mechanics; Meriam & Kraige – Engineering Mechanics",t:[
+{h:"Force and Equilibrium",s:"A force is a push or a pull. If a body stays at rest, all forces and turning effects (moments) on it cancel out.",f:"ΣF = 0 , ΣM = 0",u:"Bridges, cranes and building frames are designed so forces balance.",a:"bend",v:"static equilibrium engineering mechanics"},
+{h:"Newton’s Laws and F = ma",s:"A body keeps its motion unless a net force acts. More net force gives more acceleration; more mass gives less.",f:"F = m × a",u:"Rocket launch, car acceleration, braking distance.",a:"pendulum",v:"Newton laws of motion explained"},
+{h:"Friction",s:"Friction is the force that resists sliding between two surfaces. It has a maximum value that depends on how hard surfaces press together.",f:"f ≤ μ × N",u:"Brakes, tyre grip, clutches. Also wasted energy in machines.",a:"push",v:"friction engineering mechanics"}]},
+{n:"Strength of Materials",d:"Will a part bend, stretch or break under load?",b:"Gere & Goodno – Mechanics of Materials; Beer & Johnston – Mechanics of Materials; Hibbeler – Mechanics of Materials",t:[
+{h:"Stress and Strain",s:"Stress is load per unit area. Strain is the change in length divided by original length. In the elastic range, stress is proportional to strain (Hooke’s law).",f:"σ = F/A , ε = ΔL/L , σ = E × ε",u:"Choosing the size of a cable, bolt or lift rope.",a:"stretch",v:"stress and strain explained"},
+{h:"Bending of Beams",s:"A loaded beam bends. The top and bottom fibres take the highest stress, so I-shaped sections are efficient.",f:"σ = M × y / I",u:"Floor beams, bridge girders, aircraft wings.",a:"bend",v:"beam bending stress"},
+{h:"Torsion of Shafts",s:"Twisting a shaft creates shear stress, highest at the outer surface.",f:"τ = T × r / J",u:"Car drive shafts, screwdrivers, turbine shafts.",a:"gears",v:"torsion of circular shafts"}]},
+{n:"Thermodynamics",d:"Energy, heat, work and engines.",b:"Çengel & Boles – Thermodynamics; P.K. Nag – Engineering Thermodynamics; Moran & Shapiro",t:[
+{h:"First Law (energy is conserved)",s:"Energy cannot be created or destroyed. For a closed system, heat added minus work done by the system equals the change in internal energy.",f:"ΔU = Q − W",u:"Every engine, boiler and refrigerator energy balance.",a:"heat",v:"first law of thermodynamics"},
+{h:"Second Law and Carnot Efficiency",s:"Heat flows by itself from hot to cold. No heat engine can turn all heat into work. The best possible efficiency depends on the two temperatures (in Kelvin).",f:"η = 1 − Tc/Th",u:"Why power plants waste heat; limit for any engine design.",a:"crank",v:"second law thermodynamics Carnot"},
+{h:"Ideal Gas Law",s:"For many gases at normal conditions, pressure, volume and temperature are linked. Temperature must be in Kelvin.",f:"P × V = n × R × T",u:"Tyre pressure, compressed air tanks, engine cylinders.",a:"crank",v:"ideal gas law"}]},
+{n:"Fluid Mechanics",d:"How liquids and gases behave at rest and in motion.",b:"Frank White – Fluid Mechanics; Çengel & Cimbala – Fluid Mechanics; R.K. Bansal",t:[
+{h:"Pressure in a Fluid",s:"Pressure increases with depth because of the weight of fluid above.",f:"P = ρ × g × h",u:"Dams are thicker at the bottom; submarine hull design.",a:"pipe",v:"fluid pressure with depth"},
+{h:"Continuity Equation",s:"For steady flow of an incompressible fluid, the same volume per second passes every section. A narrow section means faster flow.",f:"A1 × v1 = A2 × v2",u:"Nozzles, garden hose, blood flow in arteries.",a:"pipe",v:"continuity equation fluid"},
+{h:"Bernoulli’s Equation",s:"Along a streamline of steady, incompressible, friction-free flow, pressure, speed and height are traded off. Faster flow means lower pressure.",f:"P + ½ρv² + ρgh = constant",u:"Aircraft wing lift, carburettors, flow meters (venturi).",a:"pipe",v:"Bernoulli equation explained"}]},
+{n:"Heat Transfer",d:"How heat moves from one place to another.",b:"Incropera – Fundamentals of Heat and Mass Transfer; Çengel – Heat and Mass Transfer",t:[
+{h:"Conduction",s:"Heat moves through a solid from hot to cold. Metals conduct well; foam and wool do not.",f:"q = −k × A × dT/dx",u:"Cooking pans, insulation in walls, computer heat sinks.",a:"heat",v:"heat conduction Fourier law"},
+{h:"Convection",s:"Heat is carried away by moving fluid, like air or water.",f:"q = h × A × (Ts − T∞)",u:"Car radiator, room fan, cooling of electronics.",a:"heat",v:"convection heat transfer"},
+{h:"Radiation",s:"Hot bodies send out energy as electromagnetic waves. No material is needed. Temperature is in Kelvin.",f:"q = ε × σ × A × T⁴",u:"Heat from the Sun, furnaces, space radiators.",a:"heat",v:"thermal radiation Stefan Boltzmann"}]},
+{n:"Theory of Machines",d:"Motion of gears, links, cams and mechanisms.",b:"S.S. Rattan – Theory of Machines; Uicker, Pennock & Shigley – Theory of Machines and Mechanisms",t:[
+{h:"Slider-Crank Mechanism",s:"A rotating crank, a connecting rod and a sliding piston change rotation into back-and-forth motion, or the reverse.",f:"Stroke = 2 × crank radius",u:"Petrol and diesel engines, compressors, pumps.",a:"crank",v:"slider crank mechanism"},
+{h:"Gears and Gear Ratio",s:"Meshing teeth pass motion between shafts. The bigger gear turns slower but with more torque.",f:"N1/N2 = Z2/Z1 (N = speed, Z = teeth)",u:"Car gearbox, watches, bicycle gears.",a:"gears",v:"gear ratio explained"},
+{h:"Cams and Followers",s:"A shaped rotating cam pushes a follower in a planned motion.",f:"Follower lift set by cam profile",u:"Engine valves, sewing machines, toys.",a:"crank",v:"cam and follower mechanism"}]},
+{n:"Machine Design",d:"Choosing sizes and materials so parts do not fail.",b:"Shigley – Mechanical Engineering Design; V.B. Bhandari – Design of Machine Elements",t:[
+{h:"Factor of Safety",s:"The ratio of what the part can carry to what it actually carries. It gives a margin for unknowns.",f:"FoS = strength / working stress",u:"Lift cables, pressure vessels, bridges.",a:"stretch",v:"factor of safety machine design"},
+{h:"Fatigue Failure",s:"Parts under repeated loading can crack and break at stresses well below their static strength.",f:"Look up S–N curve and endurance limit",u:"Aircraft structures, axles, crankshafts.",a:"bend",v:"fatigue failure S-N curve"},
+{h:"Bolts, Bearings and Shafts",s:"Bolts clamp parts, bearings reduce friction between moving parts, shafts carry power.",f:"Sizes chosen from load and standards",u:"Almost every machine.",a:"gears",v:"machine elements bearings bolts"}]},
+{n:"Manufacturing Processes",d:"How parts are actually made.",b:"Groover – Fundamentals of Modern Manufacturing; Kalpakjian & Schmid – Manufacturing Engineering and Technology",t:[
+{h:"Casting",s:"Melted metal is poured into a mould and left to solidify.",f:"Shape comes from the mould",u:"Engine blocks, pipes, statues.",a:"heat",v:"casting process"},
+{h:"Forming (Forging, Rolling)",s:"Solid metal is shaped by force without melting.",f:"Shape changed by pressing or rolling",u:"Steel sheets, crankshafts, spanners.",a:"push",v:"metal forming forging rolling"},
+{h:"Machining and Welding",s:"Machining cuts material away (turning, milling, drilling). Welding joins pieces using heat.",f:"Cutting speed V = π × D × N",u:"Precision parts, car bodies, pipelines.",a:"gears",v:"machining turning milling welding"}]},
+{n:"Materials Science",d:"What materials are made of and why they behave as they do.",b:"Callister – Materials Science and Engineering; Askeland – Science and Engineering of Materials",t:[
+{h:"Types of Materials",s:"Metals, ceramics, polymers and composites. Each has its own strength, weight, cost and heat behaviour.",f:"Choose by properties needed",u:"Steel bridges, plastic bottles, carbon-fibre bikes.",a:"stretch",v:"classes of engineering materials"},
+{h:"Stress-Strain Curve",s:"A tensile test shows the elastic range, yield point, ultimate strength and fracture.",f:"E = slope of the elastic part",u:"Checking steel quality before use.",a:"stretch",v:"stress strain curve tensile test"},
+{h:"Steel and Heat Treatment",s:"Steel is iron with a small amount of carbon. Heating and cooling in a planned way changes hardness and toughness.",f:"More carbon: harder, less ductile",u:"Tools, springs, gears.",a:"heat",v:"steel heat treatment basics"}]},
+{n:"Engineering Drawing",d:"The language engineers use to describe parts.",b:"N.D. Bhatt – Engineering Drawing; Giesecke et al. – Technical Drawing",t:[
+{h:"Orthographic Projection",s:"A 3D part is shown as flat views: front, top and side. First-angle projection is common in India and Europe; third-angle in the USA.",f:"Front + Top + Side views",u:"Every factory drawing.",a:"push",v:"orthographic projection first angle third angle"},
+{h:"Dimensioning and Tolerance",s:"Dimensions give sizes. Tolerance says how much a size may vary and still work.",f:"Size ± tolerance",u:"Making parts from different factories fit together.",a:"gears",v:"dimensioning and tolerancing basics"}]},
+{n:"IC Engines and Refrigeration",d:"Engines that burn fuel and machines that cool.",b:"Ganesan – Internal Combustion Engines; Heywood – Internal Combustion Engine Fundamentals; Çengel – Thermodynamics",t:[
+{h:"Four-Stroke Engine",s:"Four piston strokes make one cycle: suction, compression, power, exhaust. The crankshaft turns two times per cycle.",f:"Otto efficiency = 1 − 1/r^(γ−1)",u:"Cars, motorbikes, generators.",a:"crank",v:"four stroke engine working"},
+{h:"Refrigeration Cycle",s:"A refrigerant is compressed, cooled, expanded and then absorbs heat from the cold space. Work is used to move heat from cold to hot.",f:"COP = Q_cold / W",u:"Fridges, air conditioners, cold storage.",a:"heat",v:"vapour compression refrigeration cycle"}]}
+];
+// ===== ANIMATIONS =====
+const A={
+push(g,t,w,h,k){const x=40+((Math.sin(t)+1)/2)*120;g.fillRect(0,h-30,w,3);g.strokeRect(x,h-70,60,40);arrow(g,x+60,h-50,x+100,h-50);arrow(g,x+30,h-30,x-10,h-30);g.fillText("push →",x+62,h-58);g.fillText("← friction",x-12,h-12)},
+pendulum(g,t,w,h){const a=.6*Math.cos(t*3),px=w/2,py=15,L=85,x=px+L*Math.sin(a),y=py+L*Math.cos(a);g.beginPath();g.moveTo(px,py);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,12,0,7);g.fill();g.fillText("swings back and forth",8,h-8)},
+stretch(g,t,w,h){const e=(Math.sin(t*2)+1)/2*30,L=120+e;g.strokeRect(w/2-L/2,h/2-12,L,24);arrow(g,w/2+L/2,h/2,w/2+L/2+30,h/2);arrow(g,w/2-L/2,h/2,w/2-L/2-30,h/2);g.fillText("bar stretches under load",8,h-8)},
+bend(g,t,w,h){const s=(Math.sin(t*2)+1)/2*22;g.beginPath();for(let i=0;i<=40;i++){const x=40+i*5.5,y=50+s*Math.sin(Math.PI*i/40);i?g.lineTo(x,y):g.moveTo(x,y)}g.lineWidth=5;g.stroke();g.lineWidth=1.5;g.fillText("▲",34,76);g.fillText("▲",250,76);arrow(g,w/2,5,w/2,38+s);g.fillText("beam bends under load",8,h-8)},
+pipe(g,t,w,h){g.beginPath();g.moveTo(10,20);g.lineTo(100,45);g.lineTo(200,45);g.lineTo(290,20);g.moveTo(10,100);g.lineTo(100,75);g.lineTo(200,75);g.lineTo(290,100);g.stroke();for(let i=0;i<14;i++){const p=((i/14)+t*.12*1)%1,x=10+p*280,wide=x<100||x>200,sp=1;const ph=((i/14)+(wide?t*.08:t*.2))%1;const xx=10+ph*280;const top=xx<100?20+(xx-10)*.28:xx<200?45:45-(xx-200)*.28;g.beginPath();g.arc(xx,60+((i%3)-1)*(wide?18:8),3,0,7);g.fill()}g.fillText("narrow part: faster flow",8,h-8)},
+heat(g,t,w,h){for(let i=0;i<40;i++){const x=20+(i%20)*13.5,y=35+Math.floor(i/20)*35,amp=6*(1-(x-20)/270)+1;g.fillStyle=`hsl(${20+(x-20)*.6},85%,55%)`;g.beginPath();g.arc(x+amp*Math.sin(t*9+i),y+amp*Math.cos(t*7+i*2),5,0,7);g.fill()}g.fillStyle=g.strokeStyle;g.fillText("HOT → COLD: heat flows along the bar",8,h-8)},
+gears(g,t,w,h){gear(g,90,60,36,12,t*2);gear(g,90+36+18+2,60,18,6,-t*4+.26);g.fillText("small gear spins 2× faster",8,h-8)},
+crank(g,t,w,h){const cx=70,cy=60,r=22,a=t*3,px=cx+r*Math.cos(a),py=cy+r*Math.sin(a),L=80,x=px+Math.sqrt(L*L-(py-cy)**2);g.beginPath();g.arc(cx,cy,r,0,7);g.stroke();g.beginPath();g.moveTo(cx,cy);g.lineTo(px,py);g.lineTo(x,cy);g.lineWidth=3;g.stroke();g.lineWidth=1.5;g.fillRect(x,cy-14,26,28);g.strokeRect(150,cy-20,140,40);g.fillText("piston moves back and forth",8,h-8)}};
+function arrow(g,x1,y1,x2,y2){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);const a=Math.atan2(y2-y1,x2-x1);g.lineTo(x2-8*Math.cos(a-.4),y2-8*Math.sin(a-.4));g.moveTo(x2,y2);g.lineTo(x2-8*Math.cos(a+.4),y2-8*Math.sin(a+.4));g.stroke()}
+function gear(g,x,y,r,n,rot){g.beginPath();for(let i=0;i<n*2;i++){const a=rot+i*Math.PI/n,rr=i%2?r-5:r+4;g.lineTo(x+rr*Math.cos(a),y+rr*Math.sin(a))}g.closePath();g.stroke();g.beginPath();g.arc(x,y,3,0,7);g.fill()}
+// ===== APP =====
+const main=document.getElementById("main"),nav=document.getElementById("nav"),q=document.getElementById("q");
+let cur=0,cvs=[];
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function card(x){return `<div class="card"><h3>${esc(x.h)}</h3><div class="row"><div>
+<p>${esc(x.s)}</p><div class="f">${esc(x.f)}</div>
+<p><span class="tag">Real life:</span> ${esc(x.u)}</p>
+<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(x.v)}" target="_blank" rel="noopener">▶ Watch videos on this topic</a></div>
+<canvas width="300" height="120" data-a="${x.a}"></canvas></div></div>`}
+function show(i,filter){cur=i;[...nav.children].forEach((b,j)=>b.classList.toggle("on",j===i&&!filter));
+let h="";if(filter){D.forEach(s=>s.t.forEach(x=>{if((x.h+x.s+x.u).toLowerCase().includes(filter))h+=card(x)}));h=h||"<p>No topic found.</p>"}
+else{const s=D[i];h=`<h2>${esc(s.n)}</h2><div class="sub">${esc(s.d)}</div><div class="books">Books: ${esc(s.b)}</div>`+s.t.map(card).join("")}
+main.innerHTML=h;cvs=[...main.querySelectorAll("canvas")]}
+D.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s.n;b.onclick=()=>{q.value="";show(i)};nav.appendChild(b)});
+q.oninput=()=>{const v=q.value.trim().toLowerCase();v?show(cur,v):show(cur)};
+show(0);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function loop(ts){const t=ts/1000;cvs.forEach(c=>{const g=c.getContext("2d"),ink=getComputedStyle(document.body).color;g.clearRect(0,0,300,120);g.strokeStyle=ink;g.fillStyle=ink;g.lineWidth=1.5;g.font="12px system-ui";(A[c.dataset.a]||A.push)(g,reduce?0.5:t,300,120)});requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>

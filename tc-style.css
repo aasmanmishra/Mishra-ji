@@ -64,3 +64,4 @@ body{font-family:'Manrope',system-ui,sans-serif}h1,h2,h3,.logo{font-family:'Frau
 #gl{background:radial-gradient(#c9a24b33,transparent 65%)}.card,.stat{box-shadow:0 10px 30px #10182b12}.tc:hover{box-shadow:0 18px 40px #10182b30}input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px #b8893a40;border-color:var(--a)}
 .step .n{background:linear-gradient(135deg,#0b1630,#1f3a5f);color:#e3c274;font-family:'Fraunces',serif}.stat b{font-family:'Fraunces',serif;color:var(--a)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+img.av{object-fit:cover;display:block}

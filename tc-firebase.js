@@ -76,7 +76,7 @@ var api = {
             try { var sc = await getDoc(doc(fs, 'requestContacts', r.id)); if (sc.exists()) cm[r.id] = sc.data(); } catch (e) { }
           }));
         }
-        rq.forEach(function (r) { var x = cm[r.id]; if (x) { r.parent = x.parent; r.email = x.email; r.phone = x.phone; r.child = x.child; r.details = x.details; } });
+        rq.forEach(function (r) { var x = cm[r.id]; if (x) { r.parent = x.parent; r.child = x.child; r.details = x.details; } });
         return rq;
       }
       return [];
@@ -107,7 +107,7 @@ var api = {
     } else {
       b = writeBatch(fs);
       b.set(doc(fs, 'requests', id), { tutorId: o.tutorId, tutor: o.tutor, uid: u.uid, status: 'pending', info: o.info, at: at });
-      b.set(doc(fs, 'requestContacts', id), { uid: u.uid, tutorId: o.tutorId, parent: o.parent, email: u.email, phone: o.phone, child: o.child, details: o.details, at: at });
+      b.set(doc(fs, 'requestContacts', id), { uid: u.uid, tutorId: o.tutorId, parent: o.parent, child: o.child, details: o.details, at: at });
       await b.commit();
     }
     o.id = id; return o;

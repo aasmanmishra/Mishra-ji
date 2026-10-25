@@ -67,7 +67,17 @@ var api = {
         return rows(await getDocs(ad ? collection(fs, 'children') : query(collection(fs, 'children'), where('uid', '==', u.uid))));
       }
       if (c == 'requests') {
-        return rows(await getDocs(ad ? collection(fs, 'requests') : query(collection(fs, 'requests'), where('uid', '==', u.uid))));
+        // Teacher sees the request; parent contact details are merged in only when the rules allow it (admin approved).
+        var rq = rows(await getDocs(ad ? collection(fs, 'requests') : query(collection(fs, 'requests'), where(role == 'teacher' ? 'tutorId' : 'uid', '==', u.uid)))), cm = {};
+        if (ad || role == 'parent') {
+          rows(await getDocs(ad ? collection(fs, 'requestContacts') : query(collection(fs, 'requestContacts'), where('uid', '==', u.uid)))).forEach(function (x) { cm[x.id] = x; });
+        } else if (role == 'teacher') {
+          await Promise.all(rq.filter(function (r) { return r.status == 'approved'; }).map(async function (r) {
+            try { var sc = await getDoc(doc(fs, 'requestContacts', r.id)); if (sc.exists()) cm[r.id] = sc.data(); } catch (e) { }
+          }));
+        }
+        rq.forEach(function (r) { var x = cm[r.id]; if (x) { r.parent = x.parent; r.email = x.email; r.phone = x.phone; r.child = x.child; r.details = x.details; } });
+        return rq;
       }
       return [];
     } catch (e) { console.error('list ' + c, e); return []; }
@@ -95,8 +105,10 @@ var api = {
       var k = Object.assign({}, o); delete k.id; k.uid = u.uid; k.at = at;
       await setDoc(doc(fs, 'children', id), k);
     } else {
-      var r = Object.assign({}, o); delete r.id; r.uid = u.uid; r.at = at;
-      await setDoc(doc(fs, 'requests', id), r);
+      b = writeBatch(fs);
+      b.set(doc(fs, 'requests', id), { tutorId: o.tutorId, tutor: o.tutor, uid: u.uid, status: 'pending', info: o.info, at: at });
+      b.set(doc(fs, 'requestContacts', id), { uid: u.uid, tutorId: o.tutorId, parent: o.parent, email: u.email, phone: o.phone, child: o.child, details: o.details, at: at });
+      await b.commit();
     }
     o.id = id; return o;
   },
@@ -107,6 +119,7 @@ var api = {
     var b = writeBatch(fs);
     b.delete(doc(fs, c, id));
     if (c == 'tutors') b.delete(doc(fs, 'tutorContacts', id));
+    if (c == 'requests') b.delete(doc(fs, 'requestContacts', id));
     await b.commit();
   }
 };

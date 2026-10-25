@@ -30,6 +30,7 @@ var SUBJ=['Mathematics','Science','English','Physics','Chemistry','Biology','Com
 
 /* ---------- form helpers (v4) ---------- */
 (function(){var s=document.createElement('style');s.textContent='.chips{display:flex;flex-wrap:wrap;gap:8px}.chips label{display:flex;align-items:center;gap:6px;border:1.5px solid var(--bd);border-radius:99px;padding:6px 12px;cursor:pointer;font-weight:600}.chips input{width:auto;padding:0;margin:0}.chips label:has(input:checked){border-color:var(--a);background:var(--bd)}';s.textContent+='.rvw{display:flex;align-items:center;gap:10px}.rvw .av{width:40px;height:40px;font-size:15px;margin:0}.stars{display:flex;gap:2px}';document.head.appendChild(s)})();
+function tcPw(){document.querySelectorAll('input[type=password]').forEach(function(i){if(i.dataset.pw)return;i.dataset.pw=1;var w=document.createElement('span');w.style.cssText='position:relative;display:block';i.parentNode.insertBefore(w,i);w.appendChild(i);i.style.paddingRight='64px';var b=document.createElement('button');b.type='button';b.textContent='Show';b.style.cssText='position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--a);font:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:6px';b.onclick=function(){var h=i.type=='password';i.type=h?'text':'password';b.textContent=h?'Hide':'Show'};w.appendChild(b)})}
 function tcQ(s){return esc(s).replace(/"/g,'&quot;')}
 function tcRow(h){return '<div class="row">'+h+'</div>'}
 function tcTg(s){return (s||'').split(', ').map(function(x){return '<span class="tag">'+esc(x)+'</span>'}).join('')}
@@ -98,7 +99,7 @@ $('#at').innerHTML=l.length?'<table>'+l.map(function(x){return '<tr>'+r(x)+'</tr
 async function st(id,s){await S.patch('tutors',id,{status:s});await load();toast('Updated');render('admin');at('tutors')}
 async function tcRq(id,s){await S.patch('requests',id,{status:s});await load();toast('Updated');render('admin');at('requests')}
 async function rm(c,id){if(!confirm('Delete permanently?'))return;await S.del(c,id);await load();render('admin');at(c)}
-function render(v){if(v!='profile')tcEd=false;navSync();var el=$('#app');el.innerHTML=(V[v]||V.home)();document.querySelectorAll('nav a').forEach(function(a){a.classList.toggle('on',a.dataset.v==v)});
+function render(v){if(v!='profile')tcEd=false;navSync();var el=$('#app');el.innerHTML=(V[v]||V.home)();tcPw();document.querySelectorAll('nav a').forEach(function(a){a.classList.toggle('on',a.dataset.v==v)});
 if(v=='find'&&enrolled())fl();if(v=='admin'&&ADMIN)at('tutors');
 document.querySelectorAll('.rv').forEach(function(x){io.observe(x)});if(v=='home')parts();
 document.querySelectorAll('[data-n]').forEach(function(x){var n=+x.dataset.n,i=0,t=setInterval(function(){i++;x.textContent=Math.round(n*i/30);if(i>=30)clearInterval(t)},40)});

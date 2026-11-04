@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 /* ==========================================================================
-   CINEMATIC DESIGN SYSTEM & TOKENS
+   CINEMATIC DESIGN SYSTEM & MOTION GRAPHICS ENGINE
    ========================================================================== */
 :root {
   --bg: #FAF7F0;
@@ -12,7 +12,7 @@
   --a: #B8893A;          /* Burnished Gold */
   --b: #0F766E;          /* Deep Spruce Teal */
   --c: #D4A84F;          /* Radiant Amber */
-  --gold-glow: rgba(184, 137, 58, 0.32);
+  --gold-glow: rgba(184, 137, 58, 0.35);
   --gold-sheen: linear-gradient(135deg, #FFE89E 0%, #D4A84F 50%, #A67528 100%);
   --dark-glow: rgba(16, 24, 43, 0.08);
 
@@ -21,7 +21,7 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Dark Theme (Media query & data-theme="dark") */
+/* Dark Theme Support */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0A1226;
@@ -29,7 +29,7 @@
     --mut: #94A3B8;
     --card: #111C38;
     --bd: #223254;
-    --gold-glow: rgba(227, 194, 116, 0.35);
+    --gold-glow: rgba(227, 194, 116, 0.38);
     --dark-glow: rgba(0, 0, 0, 0.55);
     color-scheme: dark;
   }
@@ -41,7 +41,7 @@
   --mut: #94A3B8;
   --card: #111C38;
   --bd: #223254;
-  --gold-glow: rgba(227, 194, 116, 0.35);
+  --gold-glow: rgba(227, 194, 116, 0.38);
   --dark-glow: rgba(0, 0, 0, 0.55);
   color-scheme: dark;
 }
@@ -90,7 +90,7 @@ h2 { font-size: clamp(28px, 4.2vw, 42px); margin: 0 0 10px; }
   height: 440px;
   margin: -220px 0 0 -220px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--gold-glow) 0%, rgba(15, 118, 110, 0.12) 42%, transparent 70%);
+  background: radial-gradient(circle, var(--gold-glow) 0%, rgba(15, 118, 110, 0.15) 45%, transparent 70%);
   pointer-events: none;
   z-index: 1;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -108,7 +108,7 @@ h2 { font-size: clamp(28px, 4.2vw, 42px); margin: 0 0 10px; }
   width: 0;
   z-index: 70;
   background: linear-gradient(90deg, var(--a), var(--b), var(--c));
-  box-shadow: 0 0 12px var(--gold-glow);
+  box-shadow: 0 0 14px var(--gold-glow);
 }
 
 /* Confetti Container (#cf) */
@@ -167,7 +167,9 @@ nav a:hover, nav a.on {
   transform: translateY(-1px);
 }
 
-/* Premium Metallic Buttons (.btn) */
+/* ==========================================================================
+   BUTTONS WITH SHIMMER LIGHT-SWEEP ANIMATION
+   ========================================================================== */
 .btn {
   position: relative;
   display: inline-flex;
@@ -189,7 +191,7 @@ nav a:hover, nav a.on {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
-/* Subtle Shimmer Light Sweep on Buttons */
+/* Animated Shimmer Ray */
 .btn::after {
   content: "";
   position: absolute;
@@ -197,12 +199,12 @@ nav a:hover, nav a.on {
   left: -75%;
   width: 50%;
   height: 200%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
   transform: rotate(25deg);
   transition: left 0.75s ease;
 }
 
-.btn:hover::after { left: 125%; }
+.btn:hover::after { left: 130%; }
 
 .btn:hover {
   transform: translateY(-2px);
@@ -246,71 +248,78 @@ nav a:hover, nav a.on {
 }
 
 /* ==========================================================================
-   CINEMATIC HERO & VIDEO CAPABILITIES
+   PURE CSS ANIMATED VIDEO/AURORA MESH HERO BACKGROUND
+   (No video file required: runs completely in CSS at 60FPS)
    ========================================================================== */
 .hero {
   position: relative;
   overflow: hidden;
   color: #FFFFFF;
   text-align: center;
-  padding: 104px 5vw 124px;
-  background: radial-gradient(circle at 50% 20%, rgba(227, 194, 116, 0.15), transparent 50%),
-              linear-gradient(135deg, #0A1226 0%, #112242 50%, #0D4E4A 100%);
-  background-size: 160% 160%;
-  animation: bg 16s ease-in-out infinite;
+  padding: 110px 5vw 130px;
+  background: #0A1226;
   max-width: none;
 }
 
-@keyframes bg {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* Animated Aurora Background Layer 1 */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(184, 137, 58, 0.35), transparent 45%),
+              radial-gradient(circle at 75% 65%, rgba(15, 118, 110, 0.40), transparent 50%),
+              radial-gradient(circle at 50% 80%, rgba(212, 168, 79, 0.25), transparent 40%),
+              radial-gradient(circle at 80% 20%, rgba(31, 179, 166, 0.30), transparent 45%);
+  animation: cosmicMotion 18s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(50px);
 }
 
-/* Optional Video Background Wrapper */
-.video-wrap {
+/* Animated Aurora Background Layer 2 (Counter-wave) */
+.hero::after {
+  content: "";
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(10, 18, 38, 0.15), rgba(10, 18, 38, 0.85));
   pointer-events: none;
+  z-index: 1;
 }
 
-.video-bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.22;
-  mix-blend-mode: luminosity;
+@keyframes cosmicMotion {
+  0% { transform: rotate(0deg) scale(1) translate(0px, 0px); }
+  50% { transform: rotate(8deg) scale(1.12) translate(-30px, 20px); }
+  100% { transform: rotate(-8deg) scale(1.05) translate(30px, -20px); }
 }
 
-.hero > *:not(.video-wrap) { position: relative; z-index: 2; }
+.hero > * { position: relative; z-index: 2; }
 
-/* Floating Nebula Light Spheres (.blob) */
+/* Floating Nebula Spheres (.blob) */
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.42;
+  filter: blur(65px);
+  opacity: 0.45;
   pointer-events: none;
-  animation: fl 11s ease-in-out infinite;
+  animation: fl 10s ease-in-out infinite;
 }
 
 @keyframes fl {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(45px, -50px) scale(1.18); }
+  50% { transform: translate(50px, -45px) scale(1.2); }
 }
 
 /* Shimmering Metallic Text (#tw) */
 #tw {
   display: inline-block;
-  background: linear-gradient(90deg, #FFFFFF 0%, #FFE68C 40%, #E3C274 70%, #FFFFFF 100%);
+  background: linear-gradient(90deg, #FFFFFF 0%, #FFE68C 35%, #E3C274 65%, #FFFFFF 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer 6s linear infinite;
+  animation: shimmer 5s linear infinite;
 }
 
 @keyframes shimmer {
@@ -318,20 +327,22 @@ nav a:hover, nav a.on {
 }
 
 .hero h1 {
-  font-size: clamp(38px, 7vw, 70px);
+  font-size: clamp(38px, 7vw, 72px);
   font-weight: 700;
   line-height: 1.08;
   margin: 0 0 18px;
   color: #FFFFFF;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .hero p {
   font-size: clamp(17px, 2.4vw, 22px);
-  max-width: 640px;
-  margin: 0 auto 32px;
-  opacity: 0.94;
+  max-width: 650px;
+  margin: 0 auto 34px;
+  opacity: 0.95;
   color: #F4EFE3;
   line-height: 1.55;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .hero .btn {
@@ -343,7 +354,7 @@ nav a:hover, nav a.on {
 .hero .btn.g {
   background: transparent;
   color: #FFFFFF;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.45);
 }
 
 .hero .btn.g:hover {
@@ -356,57 +367,57 @@ nav a:hover, nav a.on {
    ========================================================================== */
 .orbit {
   position: relative;
-  width: 280px;
-  height: 280px;
-  margin: 50px auto 0;
-  perspective: 800px;
+  width: 290px;
+  height: 290px;
+  margin: 48px auto 0;
+  perspective: 900px;
 }
 
 .orbit .core {
   position: absolute;
-  inset: 95px;
+  inset: 100px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #182C52 0%, #070E1E 85%);
+  background: radial-gradient(circle at 35% 35%, #1F3660 0%, #070E1E 85%);
   border: 2px solid var(--a);
   color: var(--a);
   display: grid;
   place-items: center;
   font-size: 34px;
-  box-shadow: 0 0 36px var(--gold-glow);
-  animation: pu 3s ease-in-out infinite;
-  z-index: 3;
+  box-shadow: 0 0 35px var(--gold-glow);
+  animation: pu 2.8s ease-in-out infinite;
+  z-index: 4;
 }
 
 @keyframes pu {
-  0%, 100% { box-shadow: 0 0 24px var(--gold-glow), inset 0 0 12px rgba(227, 194, 116, 0.2); }
-  50% { box-shadow: 0 0 45px var(--gold-glow), 0 0 0 14px rgba(227, 194, 116, 0.08); }
+  0%, 100% { box-shadow: 0 0 25px var(--gold-glow), inset 0 0 10px rgba(227, 194, 116, 0.3); }
+  50% { box-shadow: 0 0 45px var(--gold-glow), 0 0 0 15px rgba(227, 194, 116, 0.1); }
 }
 
 .ring {
   position: absolute;
   inset: 0;
-  border: 1px dashed rgba(227, 194, 116, 0.35);
+  border: 1px dashed rgba(227, 194, 116, 0.45);
   border-radius: 50%;
-  animation: sp 20s linear infinite;
+  animation: sp 18s linear infinite;
   transform-style: preserve-3d;
 }
 
 .ring span {
   position: absolute;
-  width: 54px;
-  height: 54px;
-  margin: -27px;
+  width: 56px;
+  height: 56px;
+  margin: -28px;
   display: grid;
   place-items: center;
   font-size: 24px;
   color: #FFE68C;
-  background: rgba(10, 18, 38, 0.7);
-  border: 1.5px solid rgba(227, 194, 116, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 18, 38, 0.75);
+  border: 1.5px solid rgba(227, 194, 116, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  animation: sp 20s linear infinite reverse;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: sp 18s linear infinite reverse;
 }
 
 @keyframes sp {
@@ -478,7 +489,7 @@ section { padding: 76px 5vw; max-width: 1160px; margin: auto; }
   font-weight: 600;
 }
 
-/* Grids & Interactive Hover Cards (.tc) */
+/* Interactive Hover Cards with 3D Depth (.tc) */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -494,7 +505,7 @@ section { padding: 76px 5vw; max-width: 1160px; margin: auto; }
 .tc:hover {
   transform: translateY(-8px);
   border-color: var(--a);
-  box-shadow: 0 20px 42px -10px var(--dark-glow), 0 0 20px var(--gold-glow);
+  box-shadow: 0 20px 42px -10px var(--dark-glow), 0 0 22px var(--gold-glow);
 }
 
 /* Smooth Scroll Reveal (.rv, .rv.in) */
@@ -722,7 +733,7 @@ footer {
   border-top: 1px solid var(--bd);
 }
 
-/* Reduced Motion Override (A11y) */
+/* Accessibility: Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
